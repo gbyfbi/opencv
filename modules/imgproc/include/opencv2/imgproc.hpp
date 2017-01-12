@@ -245,8 +245,8 @@ enum MorphTypes{
                         //!< \f[\texttt{dst} = \mathrm{tophat} ( \texttt{src} , \texttt{element} )= \texttt{src} - \mathrm{open} ( \texttt{src} , \texttt{element} )\f]
     MORPH_BLACKHAT = 6, //!< "black hat"
                         //!< \f[\texttt{dst} = \mathrm{blackhat} ( \texttt{src} , \texttt{element} )= \mathrm{close} ( \texttt{src} , \texttt{element} )- \texttt{src}\f]
-    MORPH_HITMISS  = 7  //!< "hit and miss"
-                        //!<   .- Only supported for CV_8UC1 binary images. Tutorial can be found in [this page](https://web.archive.org/web/20160316070407/http://opencv-code.com/tutorials/hit-or-miss-transform-in-opencv/)
+    MORPH_HITMISS  = 7  //!< "hit or miss"
+                        //!<   .- Only supported for CV_8UC1 binary images. A tutorial can be found in the documentation
 };
 
 //! shape of the structuring element
@@ -3744,6 +3744,7 @@ CV_EXPORTS_W int connectedComponentsWithStats(InputArray image, OutputArray labe
 The function retrieves contours from the binary image using the algorithm @cite Suzuki85 . The contours
 are a useful tool for shape analysis and object detection and recognition. See squares.cpp in the
 OpenCV sample directory.
+@note Since opencv 3.2 source image is not modified by this function.
 
 @param image Source, an 8-bit single-channel image. Non-zero pixels are treated as 1's. Zero
 pixels remain 0's, so the image is treated as binary . You can use cv::compare, cv::inRange, cv::threshold ,
@@ -3930,8 +3931,8 @@ to the right, and its Y axis pointing upwards.
 @param returnPoints Operation flag. In case of a matrix, when the flag is true, the function
 returns convex hull points. Otherwise, it returns indices of the convex hull points. When the
 output array is std::vector, the flag is ignored, and the output depends on the type of the
-vector: std::vector\<int\> implies returnPoints=true, std::vector\<Point\> implies
-returnPoints=false.
+vector: std::vector\<int\> implies returnPoints=false, std::vector\<Point\> implies
+returnPoints=true.
  */
 CV_EXPORTS_W void convexHull( InputArray points, OutputArray hull,
                               bool clockwise = false, bool returnPoints = true );
@@ -4415,6 +4416,13 @@ it returns true .
 CV_EXPORTS bool clipLine(Size imgSize, CV_IN_OUT Point& pt1, CV_IN_OUT Point& pt2);
 
 /** @overload
+@param imgSize Image size. The image rectangle is Rect(0, 0, imgSize.width, imgSize.height) .
+@param pt1 First line point.
+@param pt2 Second line point.
+*/
+CV_EXPORTS bool clipLine(Size2l imgSize, CV_IN_OUT Point2l& pt1, CV_IN_OUT Point2l& pt2);
+
+/** @overload
 @param imgRect Image rectangle.
 @param pt1 First line point.
 @param pt2 Second line point.
@@ -4438,6 +4446,20 @@ accuracy.
 CV_EXPORTS_W void ellipse2Poly( Point center, Size axes, int angle,
                                 int arcStart, int arcEnd, int delta,
                                 CV_OUT std::vector<Point>& pts );
+
+/** @overload
+@param center Center of the arc.
+@param axes Half of the size of the ellipse main axes. See the ellipse for details.
+@param angle Rotation angle of the ellipse in degrees. See the ellipse for details.
+@param arcStart Starting angle of the elliptic arc in degrees.
+@param arcEnd Ending angle of the elliptic arc in degrees.
+@param delta Angle between the subsequent polyline vertices. It defines the approximation
+accuracy.
+@param pts Output vector of polyline vertices.
+*/
+CV_EXPORTS void ellipse2Poly(Point2d center, Size2d axes, int angle,
+                             int arcStart, int arcEnd, int delta,
+                             CV_OUT std::vector<Point2d>& pts);
 
 /** @brief Draws a text string.
 
